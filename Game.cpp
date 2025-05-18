@@ -16,25 +16,25 @@ bool Game::inputLevel() {
     char buf[5];
     Console::setColor(GRAY);
     Console::gotoxy(10, 7);
-    printf("¦®¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬<GAME KEY>¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¯");
+    printf("â”â”â”â”â”â”â”â”â”â”<GAME KEY>â”â”â”â”â”â”â”â”â”â”“");
     Sleep(10);
     Console::gotoxy(10, 8);
-    printf("¦­ UP   : Rotate Block        ¦­");
+    printf("â”ƒ UP   : Rotate Block        â”ƒ");
     Sleep(10);
     Console::gotoxy(10, 9);
-    printf("¦­ DOWN : Move One-Step Down  ¦­");
+    printf("â”ƒ DOWN : Move One-Step Down  â”ƒ");
     Sleep(10);
     Console::gotoxy(10, 10);
-    printf("¦­ SPACE: Move Bottom Down    ¦­");
+    printf("â”ƒ SPACE: Move Bottom Down    â”ƒ");
     Sleep(10);
     Console::gotoxy(10, 11);
-    printf("¦­ LEFT : Move Left           ¦­");
+    printf("â”ƒ LEFT : Move Left           â”ƒ");
     Sleep(10);
     Console::gotoxy(10, 12);
-    printf("¦­ RIGHT: Move Right          ¦­");
+    printf("â”ƒ RIGHT: Move Right          â”ƒ");
     Sleep(10);
     Console::gotoxy(10, 13);
-    printf("¦±¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦¬¦°");
+    printf("â”—â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”›");
     while (true) {
         Console::gotoxy(10, 3);
         cout << "Select Start level[1-8]:       \b\b\b\b\b\b\b";
@@ -49,7 +49,7 @@ bool Game::inputLevel() {
         }
         else {
             Console::gotoxy(10, 4);
-            cout << "¿Ã¹Ù¸¥ ¼ıÀÚ¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.";
+            cout << "ì˜¬ë°”ë¥¸ ìˆ«ìë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.";
             Sleep(1000);
             Console::gotoxy(10, 4);
             cout << "                            ";
@@ -71,8 +71,16 @@ Game::Game() : level(0), score(0), lines(0), ab_x(5), ab_y(1), isCurrentBlockAct
         totalBlock[20][j] = 1;
 }
 
+//ì»¤ì„œë¥¼ ìˆ¨ê¸°ëŠ” í•¨ìˆ˜
+void Game::hideCursor() {
+    CONSOLE_CURSOR_INFO cursorInfo;
+    cursorInfo.dwSize = 1;  // ì»¤ì„œ í¬ê¸° ì„¤ì • (1~100)
+    cursorInfo.bVisible = FALSE;  // ì»¤ì„œ ìˆ¨ê¹€
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+}
+
 void Game::run() {
-   // hideCursor();
+   hideCursor();
     srand((unsigned)time(NULL));
    // showLogo();
     if (!inputLevel()) return;
@@ -100,7 +108,7 @@ void Game::update() {
     temp.y += 1;
 
     if (checkCollision(temp)) {
-        // Ãæµ¹ ¡æ ºí·° °íÁ¤
+        // ì¶©ëŒ â†’ ë¸”ëŸ­ ê³ ì •
         for (int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {
                 if (Block::SHAPES[currentBlock.shape][currentBlock.angle][i][j]) {
@@ -124,7 +132,7 @@ void Game::update() {
         }
     }
     else {
-        // ÇÑ Ä­ ¾Æ·¡·Î
+        // í•œ ì¹¸ ì•„ë˜ë¡œ
         eraseBlock(currentBlock.shape, currentBlock.angle, currentBlock.x, currentBlock.y);
         currentBlock = temp;
     }
@@ -134,7 +142,7 @@ void Game::handleInput() {
     int key = _getch();
     Block temp = currentBlock;
 
-    if (key == 224) { // Æ¯¼öÅ°
+    if (key == 224) { // íŠ¹ìˆ˜í‚¤
         int arrow = _getch();
         switch (arrow) {
         case 72: temp.rotate(); break;
@@ -200,14 +208,14 @@ void Game::drawBlock(int shape, int angle, int xpos, int ypos)
             if (Block::SHAPES[shape][angle][j][i] == 1)
             {
                 Console::gotoxy((i + xpos) * 2 + ab_x, j + ypos + ab_y);
-                printf("¡á");
+                printf("â– ");
             }
         }
-        //gotoxy(77, 23);
+        Console::gotoxy(77, 23);
         //printf("last: Block Position - x: %d, y: %d\n", block_x, block_y);
     }
-    //SetColor(BLACK);
-    //gotoxy(77,23);
+    Console::setColor(BLACK);
+    Console::gotoxy(77,23);
     return ;
 }
 
@@ -233,7 +241,7 @@ int Game::eraseBlock(int shape, int angle, int x, int y)
 
 void Game::draw() {
 
-    // ÇöÀç ºí·° Ãâ·Â
+    // í˜„ì¬ ë¸”ëŸ­ ì¶œë ¥
     if (isCurrentBlockActive) {
         for (int i = 0; i < 4; ++i)
             for (int j = 0; j < 4; ++j)
@@ -293,5 +301,4 @@ void Game::clearLines() {
         }
     }
 }
-
 
