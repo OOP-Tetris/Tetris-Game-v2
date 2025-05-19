@@ -67,7 +67,7 @@ Game::Game() : level(0), score(0), lines(0), ab_x(5), ab_y(1), isCurrentBlockAct
     memset(totalBlock, 0, sizeof(totalBlock));
     for (int i = 0; i < 21; ++i)
         totalBlock[i][0] = totalBlock[i][13] = 1;
-    for (int j = 0; j < 14; ++j)
+    for (int j = 0; j < 14; ++j) 
         totalBlock[20][j] = 1;
 }
 
@@ -79,28 +79,146 @@ void Game::hideCursor() {
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
 }
 
+void Game::update_ReverseWorld()
+{
+    Block temp = currentBlock;
+    temp.y -= 1;
+
+    if (checkCollision_ReverseWorld(temp)) {
+        // 충돌 → 블럭 고정
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                if (Block::SHAPES[currentBlock.shape][currentBlock.angle][i][j]) {
+                    totalBlock[currentBlock.y + i][currentBlock.x + j] = 1;
+                }
+            }
+        }
+
+        isCurrentBlockActive = false;
+        clearLines();
+        map.drawFixedBlocks(totalBlock);
+        currentBlock = nextBlock;
+        nextBlock = Block(makeNewBlock());
+        nextBlock.y = 17;
+        isCurrentBlockActive = true;
+        map.drawNextBlock(nextBlock.shape, nextBlock.angle);
+        map.drawGameStatus(level, score, stages[level].clearLine - lines);
+
+        if (checkCollision_ReverseWorld(currentBlock)) {
+            //gameOver();
+            for (int j = 0; j < 14; j++) {
+               
+                totalBlock[0][j] = 0;
+            }
+            exit(0);
+            level += 1;
+            return;
+        }
+    }
+    else {
+        // 한 칸 아래로
+        eraseBlock(currentBlock.shape, currentBlock.angle, currentBlock.x, currentBlock.y);
+        currentBlock = temp;
+    }
+}
+
+void Game::handleInput_ReverseWorld()
+{
+    int key = _getch();
+    Block temp = currentBlock;
+    if (key == 224) { // 특수키
+        int arrow = _getch();
+        switch (arrow) {
+        case 72: temp.rotate(); break;
+        case 75: temp.x--; break;
+        case 77: temp.x++; break;
+        case 80: temp.y--; break;
+        }
+    }
+    else if (key == ' ') {
+        while (!checkCollision_ReverseWorld(temp)) {
+            eraseBlock(currentBlock.shape, currentBlock.angle, currentBlock.x, currentBlock.y);
+            currentBlock = temp;
+            temp.y--;
+        }
+        temp.y++;
+    }
+
+    if (!checkCollision_ReverseWorld(temp)) {
+        eraseBlock(currentBlock.shape, currentBlock.angle, currentBlock.x, currentBlock.y);
+        currentBlock = temp;
+    }
+
+    draw();
+}
+
+bool Game::checkCollision_ReverseWorld(const Block& blk)
+{
+    for (int i = 0; i < 4; ++i)
+        for (int j = 0; j < 4; ++j)
+            if (Block::SHAPES[blk.shape][blk.angle][i][j]) {
+                int dx = blk.x + j;
+                int dy = blk.y + i;
+                if (dy > 20) continue;
+                if (dy <= -1 || dx < 0 || dx >= 14 || totalBlock[dy][dx])
+                    return true;
+            }
+    return false;
+}
+
 void Game::run() {
    hideCursor();
     srand((unsigned)time(NULL));
    // showLogo();
     if (!inputLevel()) return;
     system("cls");
+
+    //거꾸로 나라의 경우 위의 화면이 차 있어야 한다
+    if (level % 3 == 0) {
+        for (int j = 0; j < 14; j++) {
+            totalBlock[20][j] = 0;
+        }
+     
+    }
+    else {
+        for (int j = 0; j < 14; j++) {
+            totalBlock[20][j] = 1;
+        }
+    }
+
     currentBlock = Block(makeNewBlock());
     nextBlock = Block(makeNewBlock());
+   
     map.drawFrame(level);
     map.drawGameStatus(level, score, stages[level].clearLine-lines);
     map.drawNextBlock(nextBlock.shape, nextBlock.angle);
     draw();
 
-    while (true) {
-        if (_kbhit()) handleInput();
-        static int frame = 0;
-        if (++frame % stages[level].speed == 0) {
-            update();
-            draw();
+    if (level % 3 == 0 && level < 9) {
+        currentBlock.y = 15;
+        nextBlock.y = 15;
+        while (true) {
+            if (_kbhit()) handleInput_ReverseWorld();
+            static int frame = 0;
+            if (++frame % stages[level].speed == 0) {
+                update_ReverseWorld();
+                draw();
+            }
+            Sleep(15);
         }
-        Sleep(15);
     }
+    else {
+        while (true) {
+            if (_kbhit()) handleInput();
+            static int frame = 0;
+            if (++frame % stages[level].speed == 0) {
+                update();
+                draw();
+            }
+            Sleep(15);
+        }
+    }
+    
 }
 
 void Game::update() {
@@ -116,7 +234,7 @@ void Game::update() {
                 }
             }
         }
-            
+        
         isCurrentBlockActive = false;
         clearLines();
         map.drawFixedBlocks(totalBlock);
@@ -128,6 +246,7 @@ void Game::update() {
 
         if (checkCollision(currentBlock)) {
             //gameOver();
+            exit(0);
             return;
         }
     }
@@ -291,6 +410,7 @@ void Game::clearLines() {
                 if (level < 9) {
                     level++;
                     map.drawFrame(level);
+                 
                     map.drawGameStatus(level, score, stages[level].clearLine-lines);
                 }
                 else {
@@ -301,4 +421,6 @@ void Game::clearLines() {
         }
     }
 }
+
+
 
