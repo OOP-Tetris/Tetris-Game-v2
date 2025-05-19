@@ -8,30 +8,34 @@
 
 class Game {
 private:
-    int level;               // ÇöÀç ½ºÅ×ÀÌÁö (0~9)
-    int score;               // Á¡¼ö
-    int lines;               // ÇöÀç ½ºÅ×ÀÌÁö¿¡¼­ Å¬¸®¾îÇÑ ÁÙ ¼ö
-    int ab_x, ab_y;          // °ÔÀÓ ¸Ê Ãâ·Â ½ÃÀÛ À§Ä¡
-    bool isCurrentBlockActive; // ÇöÀç ºí·°ÀÌ °íÁ¤µÆ´ÂÁö ¿©ºÎ
+    int level;               // í˜„ì¬ ìŠ¤í…Œì´ì§€ (0~9)
+    int score;               // ì ìˆ˜
+    int lines;               // í˜„ì¬ ìŠ¤í…Œì´ì§€ì—ì„œ í´ë¦¬ì–´í•œ ì¤„ ìˆ˜
+    int ab_x, ab_y;          // ê²Œì„ ë§µ ì¶œë ¥ ì‹œì‘ ìœ„ì¹˜
+    bool isCurrentBlockActive; // í˜„ì¬ ë¸”ëŸ­ì´ ê³ ì •ëëŠ”ì§€ ì—¬ë¶€
 
-    char totalBlock[21][14]; // °ÔÀÓ ÀüÃ¼ ¸Ê (°íÁ¤µÈ ºí·° Æ÷ÇÔ)
-    Block currentBlock;      // ÇöÀç ¶³¾îÁö´Â ºí·°
-    Block nextBlock;         // ´ÙÀ½ ºí·°
-    Stage stages[10];        // ½ºÅ×ÀÌÁöº° ¼Óµµ, Á¶°Ç µî
+    char totalBlock[21][14]; // ê²Œì„ ì „ì²´ ë§µ (ê³ ì •ëœ ë¸”ëŸ­ í¬í•¨)
+    Block currentBlock;      // í˜„ì¬ ë–¨ì–´ì§€ëŠ” ë¸”ëŸ­
+    Block nextBlock;         // ë‹¤ìŒ ë¸”ëŸ­
+    Stage stages[10];        // ìŠ¤í…Œì´ì§€ë³„ ì†ë„, ì¡°ê±´ ë“±
     Map map;
 
 public:
     Game();
 
-    void run();                         // °ÔÀÓ ½ÃÀÛ ¹× ¸ŞÀÎ ·çÇÁ
-    void update();                      // ºí·° ÀÚµ¿ ÇÏ°­ ¹× °íÁ¤ Ã³¸®
-    void handleInput();                 // »ç¿ëÀÚ Å° ÀÔ·Â Ã³¸®
-    void draw();                        // ÀüÃ¼ ±×¸®±â (ºí·° + ¸Ê + »óÅÂÃ¢)
-    void clearLines();                 // ÁÙ »èÁ¦ ¹× Á¡¼ö Ã³¸®
-    bool checkCollision(const Block& blk);   // Ãæµ¹ ¿©ºÎ È®ÀÎ
-    int makeNewBlock();                      // »õ ºí·° Á¾·ù ·£´ı »ı¼º
-    bool inputLevel();                       // ½ÃÀÛ ·¹º§ ÀÔ·Â
+    void run();                         // ê²Œì„ ì‹œì‘ ë° ë©”ì¸ ë£¨í”„
+    void update();                      // ë¸”ëŸ­ ìë™ í•˜ê°• ë° ê³ ì • ì²˜ë¦¬
+    void handleInput();                 // ì‚¬ìš©ì í‚¤ ì…ë ¥ ì²˜ë¦¬
+    void draw();                        // ì „ì²´ ê·¸ë¦¬ê¸° (ë¸”ëŸ­ + ë§µ + ìƒíƒœì°½)
+    void clearLines();                 // ì¤„ ì‚­ì œ ë° ì ìˆ˜ ì²˜ë¦¬
+    bool checkCollision(const Block& blk);   // ì¶©ëŒ ì—¬ë¶€ í™•ì¸
+    int makeNewBlock();                      // ìƒˆ ë¸”ëŸ­ ì¢…ë¥˜ ëœë¤ ìƒì„±
+    bool inputLevel();                       // ì‹œì‘ ë ˆë²¨ ì…ë ¥
     void drawBlock(int shape,int angle, int xpos, int ypos);
     int eraseBlock(int shape, int angle, int x, int y);
+    void hideCursor();
+    void update_ReverseWorld();
+    void handleInput_ReverseWorld();
+    bool checkCollision_ReverseWorld(const Block& blk);
+    
 };
-
